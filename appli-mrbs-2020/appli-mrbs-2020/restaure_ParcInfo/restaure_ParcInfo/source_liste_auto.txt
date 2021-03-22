@@ -1,0 +1,34 @@
+Pour obliger phpmyadmin a demander login/pwd a chaque connexion
+dans UwAmp\phpapps\phpmyadmin\config.inc.php rubrique [Authentication type]
+$cfg['Servers'][$i]['auth_type'] = 'http';		/* au lieu de 'config' */
+
+
+Pour modifier le moteur par défaut des BDD, modifier UwAmp\bin\database\mysql-5.5.9\my_source.ini 
+dans rubrique [mysqld] ajouter : default_storage_engine=INNODB
+
+pour empecher le systeme de tronquer des données lors de la modif de taille de champs, il faut activer le mode strict en ajoutant dans la rubrique [mysqld] : 
+# Set the SQL mode to strict
+sql-mode="traditional"
+
+
+pour modifier le prompt en invite de commande avec affichage user et bdd
+Ouvrez le fichier my.ini dans le répertoire d’installation de votre serveur. Juste en dessous de la section [mysql], ajoutez les 2 lignes suivantes :
+#mon prompt
+prompt=(\\u@\\h) [\\d]\\_mysql>\\_
+
+____________________________________________________________________________
+Création de la BDD de travail parcInfo:
+
+CREATE DATABASE parcInfo;
+CREATE USER 'user_parc'@'%' IDENTIFIED BY "user_parc";
+GRANT ALL ON parcInfo.* TO 'user_parc'@'%';
+use parcInfo;
+
+source F:\restaure_ParcInfo\1_creParc.sql
+source F:\restaure_ParcInfo\2_insParc.sql
+source F:\restaure_ParcInfo\3_modification.sql
+source F:\restaure_ParcInfo\4_evolution.sql
+source F:\restaure_ParcInfo\5_creaDynamique.sql
+source F:\restaure_ParcInfo\6_modifSynchronisees.sql
+source F:\restaure_ParcInfo\7_vues.sql
+____________________________________________________________________________
