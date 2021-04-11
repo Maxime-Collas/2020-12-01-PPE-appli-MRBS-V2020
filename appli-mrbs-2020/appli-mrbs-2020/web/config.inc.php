@@ -54,7 +54,7 @@ $db_host = "localhost";
 // $db_port = 1234;
 // Database name:
 //$db_database = "gestsalleinfo";
-$db_database = "mrbs";
+$db_database = "mrbs_web";
 // Schema name.  This only applies to PostgreSQL and is only necessary if you have more
 // than one schema in your database and also you are using the same MRBS table names in
 // multiple schemas.
