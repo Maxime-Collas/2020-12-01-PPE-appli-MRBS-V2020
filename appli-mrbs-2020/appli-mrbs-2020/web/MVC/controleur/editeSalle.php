@@ -1,5 +1,16 @@
 <?php
+
 namespace MRBS;
+
+if ($_SERVER["SCRIPT_FILENAME"] == __FILE__) {
+    $racine = "..";
+}
+/*
+include_once "$racine/modele/bd.etudiant.inc.php";
+include_once "$racine/modele/bd.classe.inc.php";
+*/
+session_start();
+
 
 use MRBS\Form\Form;
 use MRBS\Form\ElementInputSubmit;
@@ -14,9 +25,10 @@ use MRBS\Form\FieldInputText;
 use MRBS\Form\FieldSelect;
 use MRBS\Form\FieldTextarea;
 
-require "defaultincludes.inc";
-require_once "mrbs_sql.inc";
 
+require_once "version.inc";
+require_once "mrbs_sql.inc";
+require_once "MVC/modele/bd.Salle.inc.php";
 
 // If you want to add some extra columns to the room table to describe the room
 // then you can do so and this page should automatically recognise them and handle
@@ -205,7 +217,7 @@ function get_fieldset_general($data)
             ->setControlAttributes(array('name'     => 'capacity',
                                          'min'      => '0',
                                          'value'    => $data['capacity'],
-                                         'disabled' => $disabled));
+                                         'disabled' => True));
       $fieldset->addElement($field);
   } else{
     $field->setLabel(get_vocab('capacity'))
@@ -215,6 +227,7 @@ function get_fieldset_general($data)
                                      'disabled' => $disabled));
     $fieldset->addElement($field);
   }
+
   // Room admin email
   $field = new FieldInputEmail();
   $field->setLabel(get_vocab('room_admin_email'))
@@ -272,64 +285,6 @@ function get_fieldset_general($data)
   return $fieldset;
 }
 
-
-// Check the user is authorised for this page
-checkAuthorised(this_page());
-
-$context = array(
-    'view'      => $view,
-    'view_all'  => $view_all,
-    'year'      => $year,
-    'month'     => $month,
-    'day'       => $day,
-    'area'      => isset($area) ? $area : null,
-    'room'      => isset($room) ? $room : null
-  );
-
-print_header($context);
-
-// Get the details for this room
-if (empty($room) || is_null($data = get_room_details($room)))
-{
-  fatal_error(get_vocab('invalid_room'));
-}
-
-$errors = get_form_var('errors', 'array');
-
-// Generate the form
-$form = new Form();
-
-$attributes = array('id'     => 'edit_room',
-                    'class'  => 'standard',
-                    'action' => multisite('edit_room_handler.php'),
-                    'method' => 'post');
-
-// Non-admins will only be allowed to view room details, not change them
-$legend = (is_admin()) ? get_vocab('editroom') : get_vocab('viewroom');
-
-$form->setAttributes($attributes)
-     ->addHiddenInput('room', $data['id'])
-     ->addHiddenInput('old_area', $data['area_id'])
-     ->addHiddenInput('old_room_name', $data['room_name']);
-
-$outer_fieldset = new ElementFieldset();
-
-$outer_fieldset->addLegend($legend)
-               ->addElement(get_fieldset_errors($errors))
-               ->addElement(get_fieldset_general($data));
-
-$form->addElement($outer_fieldset);
-
-$form->render();
-
-if ($auth['allow_custom_html'])
-{
-  // Now the custom HTML
-  echo "<div id=\"div_custom_html\">\n";
-  // no htmlspecialchars() because we want the HTML!
-  echo (isset($data['custom_html'])) ? $data['custom_html'] . "\n" : "";
-  echo "</div>\n";
-}
-
-
-print_footer();
+$lesPostes = allPostForIdSalle($_GET['room']);
+$titre = "Choix";
+include "$racine/vue/vueEditeSalle.php";

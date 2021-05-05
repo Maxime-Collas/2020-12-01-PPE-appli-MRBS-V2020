@@ -1,5 +1,16 @@
 <?php
+
 namespace MRBS;
+
+if ($_SERVER["SCRIPT_FILENAME"] == __FILE__) {
+    $racine = "..";
+}
+/*
+include_once "$racine/modele/bd.etudiant.inc.php";
+include_once "$racine/modele/bd.classe.inc.php";
+*/
+session_start();
+
 
 use MRBS\Form\Form;
 use MRBS\Form\ElementInputSubmit;
@@ -14,9 +25,11 @@ use MRBS\Form\FieldInputText;
 use MRBS\Form\FieldSelect;
 use MRBS\Form\FieldTextarea;
 
-require "defaultincludes.inc";
-require_once "mrbs_sql.inc";
 
+require_once "version.inc";
+require_once "mrbs_sql.inc";
+require_once "MVC/modele/bd.Salle.inc.php";
+require_once "MVC/modele/bd.Poste.inc.php";
 
 // If you want to add some extra columns to the room table to describe the room
 // then you can do so and this page should automatically recognise them and handle
@@ -135,7 +148,6 @@ function get_fieldset_errors($errors)
   return $fieldset;
 }
 
-
 function get_fieldset_general($data)
 {
   global $auth;
@@ -144,99 +156,95 @@ function get_fieldset_general($data)
 
   $fieldset = new ElementFieldset();
 
-  // The area select
-  $areas = get_area_names($all=true);
+  $infoPoste = unPoste($_GET['poste'])[0]; // donne toutes les informations sur le poste selectionne
+
+ /**********************           **********************/
+ // liste des Poste pour la salle actuellement selectionne  
+ 
+ $touslesPostes = allPoste();
+ $nomPostes[] = 'nouveau Poste'; 
+ $idPostes[] = null; 
+ foreach($touslesPostes as $lePoste){
+      $nomPostes[$lePoste['Numero']] = $lePoste['Nom']; 
+ }
+   /*
+  var_dump($nomPostes); 
+  echo " </br> "; 
+  var_dump($idPostes); 
+ /**/
   $field = new FieldSelect();
-  $field->setLabel(get_vocab('area'))
-        ->setControlAttributes(array('name'     => 'new_area',
+  $field->setLabel('Numero Poste') 
+        ->setControlAttributes(array('name'     => 'new_Poste',
                                      'disabled' => $disabled))
-        ->addSelectOptions($areas, $data['area_id'], true);
+        ->addSelectOptions($nomPostes, $infoPoste['nPoste'], true);
   $fieldset->addElement($field);
 
-  // Room name
+  /**********************           **********************/
+  // liste des Salle avec la salle selectionne en parametre de depart
+  $lesSalles = allSalle(); 
+  foreach($lesSalles as $laSalle){
+        $nomSalles[$laSalle['Numero']] = $laSalle['Nom']; 
+  }
+  /*
+  var_dump($nomSalles); 
+  echo " </br> "; 
+  var_dump($idSalles); 
+ /**/
+
+  $field = new FieldSelect();
+  $field->setLabel('Numero Salle')
+        ->setControlAttributes(array('name'     => 'Salle', 
+                                     'disabled' => $disabled))
+        ->addSelectOptions($nomSalles, $infoPoste['nSalle'], true);
+  $fieldset->addElement($field);
+
+  /**********************           **********************/
+  // Nom du poste
+
   $field = new FieldInputText();
-  $field->setLabel(get_vocab('name'))
-        ->setControlAttributes(array('name'      => 'room_name',
-                                     'value'     => $data['room_name'],
+  $field->setLabel('Nom')
+        ->setControlAttributes(array('name'      => 'name',
+                                     'value'     => $infoPoste['nomPoste'],
                                      'maxlength' => maxlength('room.room_name'),
                                      'required'  => true,
                                      'disabled'  => $disabled));
   $fieldset->addElement($field);
 
-  // Sort key
+  /**********************           **********************/
+  // IP du poste 
   if (is_admin())
   {
     $field = new FieldInputText();
-    $field->setLabel(get_vocab('sort_key'))
-          ->setLabelAttribute('title', get_vocab('sort_key_note'))
-          ->setControlAttributes(array('name'      => 'sort_key',
-                                       'value'     => $data['sort_key'],
+    $field->setLabel('IP')
+          ->setLabelAttribute('title', "IP")
+          ->setControlAttributes(array('name'      => 'indIP',
+                                       'value'     => $infoPoste['indIP'],
                                        'maxlength' => maxlength('room.sort_key'),
                                        'disabled'  => $disabled));
     $fieldset->addElement($field);
   }
 
-  // Status - Enabled or Disabled
-  if (is_admin())
-  {
-    $options = array('0' => get_vocab('enabled'),
-                     '1' => get_vocab('disabled'));
-    $value = ($data['disabled']) ? '1' : '0';
-    $field = new FieldInputRadioGroup();
-    $field->setLabel(get_vocab('status'))
-          ->setLabelAttributes(array('title' => get_vocab('disabled_room_note')))
-          ->addRadioOptions($options, 'room_disabled', $value, true, $disabled);
-    $fieldset->addElement($field);
-  }
-
-  // Description
+  /**********************           **********************/
+  // ad du Poste 
   $field = new FieldInputText();
-  $field->setLabel(get_vocab('description'))
-        ->setControlAttributes(array('name'      => 'description',
-                                     'value'     => $data['description'],
+  $field->setLabel('ad')
+        ->setControlAttributes(array('name'      => 'ad',
+                                     'value'     => $infoPoste['ad'],
                                      'maxlength' => maxlength('room.description'),
                                      'disabled'  => $disabled));
   $fieldset->addElement($field);
 
-  // Capacity
-  $field = new FieldInputNumber();
-  if ($data['area_id'] == 1) {
-      $field->setLabel("Nombre de Poste")
-            ->setControlAttributes(array('name'     => 'capacity',
-                                         'min'      => '0',
-                                         'value'    => $data['capacity'],
-                                         'disabled' => $disabled));
-      $fieldset->addElement($field);
-  } else{
-    $field->setLabel(get_vocab('capacity'))
-        ->setControlAttributes(array('name'     => 'capacity',
-                                     'min'      => '0',
-                                     'value'    => $data['capacity'],
-                                     'disabled' => $disabled));
-    $fieldset->addElement($field);
-  }
-  // Room admin email
+  /**********************           **********************/
+  // Type de Poste 
   $field = new FieldInputEmail();
-  $field->setLabel(get_vocab('room_admin_email'))
-        ->setLabelAttribute('title', get_vocab('email_list_note'))
-        ->setControlAttributes(array('name'      => 'room_admin_email',
-                                     'value'     => $data['room_admin_email'],
+  $field->setLabel('Type')
+        ->setLabelAttribute('title', "labType")
+        ->setControlAttributes(array('name'      => 'Type',
+                                     'value'     => $infoPoste['typePoste'],
                                      'multiple'  => true,
                                      'disabled'  => $disabled));
   $fieldset->addElement($field);
-
-  // Invalid types
-  $field = new FieldSelect();
-  $field->setAttribute('class', 'multiline')
-        ->setLabel(get_vocab('invalid_types'))
-        ->setLabelAttribute('title', get_vocab('invalid_types_note'))
-        ->setControlAttributes(array(
-            'name'     => 'invalid_types[]',
-            'multiple' => true)
-          )
-        ->addSelectOptions(get_type_options(true), $data['invalid_types'], true);
-  $fieldset->addElement($field);
-
+  
   // The custom HTML
   if (is_admin() && $auth['allow_custom_html'])
   {
@@ -248,7 +256,7 @@ function get_fieldset_general($data)
           ->setControlText($data['custom_html']);
     $fieldset->addElement($field);
   }
-
+ 
   // Then the custom fields
   $fields = get_custom_fields($data);
   $fieldset->addElements($fields);
@@ -257,12 +265,12 @@ function get_fieldset_general($data)
   $field = new FieldInputSubmit();
 
   $back = new ElementInputSubmit();
-  $back->setAttributes(array('value'      => get_vocab('backadmin'),
+  $back->setAttributes(array( 'value'     => get_vocab('backadmin'),
                              'formaction' => multisite('admin.php')));
   $field->setAttribute('class', 'buttons')
         ->addLabelClass('no_suffix')
         ->addLabelElement($back)
-        ->setControlAttribute('value', get_vocab('change'));
+        ->setControlAttribute('value', 'Creation/Modification');
   if (!is_admin())
   {
     $field->removeControl();
@@ -272,64 +280,55 @@ function get_fieldset_general($data)
   return $fieldset;
 }
 
+/********************* Gestion des donnee en Post *********************/
+if(isset($_POST)){
+   echo 'il y a des donnee Poste'; 
+   if(isset($_POST['new_Poste']) &&
+      isset($_POST['Salle']) &&
+      isset($_POST['name']) &&
+      isset($_POST['indIP']) &&
+      isset($_POST['ad']) &&
+      isset($_POST['Type'])
+      ){
+      echo "</br>" . $_POST['new_Poste'] . "</br>"; 
 
-// Check the user is authorised for this page
-checkAuthorised(this_page());
+      echo "Numero du poste : ".$_POST['new_Poste'] . "</br>"; 
+      echo $_POST['Salle'] . "</br>"; 
+      echo $_POST['name'] . "</br>"; 
+      echo $_POST['indIP'] . "</br>"; 
+      echo $_POST['ad'] . "</br>"; 
+      echo $_POST['Type'] ; 
+          if($_POST['new_Poste'] === "0"){
 
-$context = array(
-    'view'      => $view,
-    'view_all'  => $view_all,
-    'year'      => $year,
-    'month'     => $month,
-    'day'       => $day,
-    'area'      => isset($area) ? $area : null,
-    'room'      => isset($room) ? $room : null
-  );
+                echo " </br> check crea nouveau poste "; 
+                
+                creePoste($_POST['name'], 
+                          $_POST['indIP'], 
+                          $_POST['ad'], 
+                          $_POST['Type'], 
+                          $_POST['Salle']); 
+                /**/ //($nomPoste, $indIP, $ad, $typePoste, $nSalle)
+          }else{
+                echo " </br> Modifier un poste"; 
+                
+                modifierPoste($_POST['new_Poste'], 
+                          $_POST['name'], 
+                          $_POST['indIP'], 
+                          $_POST['ad'], 
+                          $_POST['Type'], 
+                          $_POST['Salle']); 
+                          /**/ //($idPoste, $nomPoste, $indIP, $ad, $typePoste, $nSalle)
+          }
+      }
 
-print_header($context);
-
-// Get the details for this room
-if (empty($room) || is_null($data = get_room_details($room)))
-{
-  fatal_error(get_vocab('invalid_room'));
-}
-
-$errors = get_form_var('errors', 'array');
-
-// Generate the form
-$form = new Form();
-
-$attributes = array('id'     => 'edit_room',
-                    'class'  => 'standard',
-                    'action' => multisite('edit_room_handler.php'),
-                    'method' => 'post');
-
-// Non-admins will only be allowed to view room details, not change them
-$legend = (is_admin()) ? get_vocab('editroom') : get_vocab('viewroom');
-
-$form->setAttributes($attributes)
-     ->addHiddenInput('room', $data['id'])
-     ->addHiddenInput('old_area', $data['area_id'])
-     ->addHiddenInput('old_room_name', $data['room_name']);
-
-$outer_fieldset = new ElementFieldset();
-
-$outer_fieldset->addLegend($legend)
-               ->addElement(get_fieldset_errors($errors))
-               ->addElement(get_fieldset_general($data));
-
-$form->addElement($outer_fieldset);
-
-$form->render();
-
-if ($auth['allow_custom_html'])
-{
-  // Now the custom HTML
-  echo "<div id=\"div_custom_html\">\n";
-  // no htmlspecialchars() because we want the HTML!
-  echo (isset($data['custom_html'])) ? $data['custom_html'] . "\n" : "";
-  echo "</div>\n";
 }
 
 
-print_footer();
+/**********************************************************************/
+
+
+$touslesPostes = allPoste();
+$lesPostes = allPostForIdSalle($_GET['room']);
+$idPost = null ; 
+
+include "$racine/vue/vueEditePoste.php";

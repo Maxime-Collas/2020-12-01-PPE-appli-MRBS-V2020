@@ -448,6 +448,7 @@ if ($refresh)
 }
 
 // print the page header
+/*
 $context = array(
     'view'      => $view,
     'view_all'  => $view_all,
@@ -456,9 +457,9 @@ $context = array(
     'day'       => $day,
     'area'      => $area,
     'room'      => isset($room) ? $room : null
-  );
+  );*/
 
-print_header($context);
+print_header();
 
 echo "<div class=\"minicalendars\">\n";
 echo "</div>\n";

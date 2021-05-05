@@ -204,10 +204,19 @@ function generate_new_room_form()
 
   // Capacity
   $field = new FieldInputNumber();
-  $field->setLabel(get_vocab('capacity'))
-        ->setControlAttributes(array('name' => 'capacity',
+
+  if ($hidden_inputs['area'] == 1) {
+        $field->setLabel( "Nombre de Poste")
+            ->setControlAttributes(array('name' => 'capacity',
+                                        'min'  => '0'));
+        $fieldset->addElement($field); 
+  }else{
+    $field->setLabel( get_vocab('capacity'))
+          ->setControlAttributes(array('name' => 'capacity',
                                      'min'  => '0'));
-  $fieldset->addElement($field);
+    $fieldset->addElement($field);
+  }
+
 
   // The email field
   $field = new FieldInputEmail();
@@ -425,7 +434,14 @@ if (is_admin() || !empty($enabled_areas))
             }
             // We don't use htmlspecialchars() here because the column names are
             // trusted and some of them may deliberately contain HTML entities (eg &nbsp;)
+            if ($area == 1) {
+                if($text == "Maximum de personnes"){
+                $text = "Nombre de poste"; 
+                }
+            }
             echo "<th>$text</th>\n";
+
+
           }
         }
 
@@ -449,7 +465,13 @@ if (is_admin() || !empty($enabled_areas))
             echo "<tr class=\"$row_class\">\n";
 
             $html_name = htmlspecialchars($r['room_name']);
-            $href = multisite('edit_room.php?room=' . $r['id']);
+
+            if($area == 1){
+           // on cree le lien entre l'application et le model MVC avec le fichier MVC.php
+                $href = multisite('MVC.php?action=editeS&room=' . $r['id']);
+            }else{
+                $href = multisite('edit_room.php?room=' . $r['id']);
+            }
             // We insert an invisible span containing the sort key so that the rooms will
             // be sorted properly
             echo "<td><div>" .

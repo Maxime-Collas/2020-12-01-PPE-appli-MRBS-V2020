@@ -1,0 +1,53 @@
+th.nameT1 {
+    background-color: cornflowerblue;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+th.nameT2 {
+    background-color: lightskyblue;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+td.nameT1 {
+    background-color: silver;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+td.nameT2 {
+    background-color: gold;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+div.contents {
+    display: flex;
+    flex-direction: column; 
+}/**/
+
+.ajoutPoste {
+    /*border: double;*/
+    /*Permets d'aligner les element contenu en colonne*/
+    display: flex;
+    flex-direction: column;
+    /*Permets d'adapter la taille du conteneur selon son contenu*/
+    width: fit-content;
+}
+
+a.ajoutPoste {
+    /*Augmente la taille du conteneur de 15 px de chaque cote*/
+    padding: 15px;
+    /* Ajoute une couleur a l'interieur du conteneur*/
+    background-color: darkgray;
+    /* Ajoute une bordure au conteneur*/
+    border: outset;
+    /* Permets d'aligner tous les elements interne au centre par rapport 
+        au conteneur preccedant */
+    align-self: center;
+}
+
+a.poste {
+    color: snow; 
+}
