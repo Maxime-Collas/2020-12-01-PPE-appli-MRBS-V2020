@@ -282,7 +282,8 @@ function get_fieldset_general($data)
 
 /********************* Gestion des donnee en Post *********************/
 if(isset($_POST)){
-   echo 'il y a des donnee Poste'; 
+   //echo 'il y a des donnee Poste'; 
+
    if(isset($_POST['new_Poste']) &&
       isset($_POST['Salle']) &&
       isset($_POST['name']) &&
@@ -290,6 +291,7 @@ if(isset($_POST)){
       isset($_POST['ad']) &&
       isset($_POST['Type'])
       ){
+      /*
       echo "</br>" . $_POST['new_Poste'] . "</br>"; 
 
       echo "Numero du poste : ".$_POST['new_Poste'] . "</br>"; 
@@ -298,10 +300,11 @@ if(isset($_POST)){
       echo $_POST['indIP'] . "</br>"; 
       echo $_POST['ad'] . "</br>"; 
       echo $_POST['Type'] ; 
+      /**/
           if($_POST['new_Poste'] === "0"){
-
-                echo " </br> check crea nouveau poste "; 
-                
+          
+                echo " </br> Poste cree avec succes !"; 
+                /**/
                 creePoste($_POST['name'], 
                           $_POST['indIP'], 
                           $_POST['ad'], 
@@ -309,7 +312,7 @@ if(isset($_POST)){
                           $_POST['Salle']); 
                 /**/ //($nomPoste, $indIP, $ad, $typePoste, $nSalle)
           }else{
-                echo " </br> Modifier un poste"; 
+                echo " </br> Poste modifier avec succes !"; 
                 
                 modifierPoste($_POST['new_Poste'], 
                           $_POST['name'], 

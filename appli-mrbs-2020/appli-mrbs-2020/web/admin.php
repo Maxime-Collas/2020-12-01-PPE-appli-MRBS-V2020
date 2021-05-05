@@ -205,17 +205,11 @@ function generate_new_room_form()
   // Capacity
   $field = new FieldInputNumber();
 
-  if ($hidden_inputs['area'] == 1) {
-        $field->setLabel( "Nombre de Poste")
-            ->setControlAttributes(array('name' => 'capacity',
-                                        'min'  => '0'));
-        $fieldset->addElement($field); 
-  }else{
     $field->setLabel( get_vocab('capacity'))
           ->setControlAttributes(array('name' => 'capacity',
                                      'min'  => '0'));
     $fieldset->addElement($field);
-  }
+
 
 
   // The email field
@@ -434,11 +428,6 @@ if (is_admin() || !empty($enabled_areas))
             }
             // We don't use htmlspecialchars() here because the column names are
             // trusted and some of them may deliberately contain HTML entities (eg &nbsp;)
-            if ($area == 1) {
-                if($text == "Maximum de personnes"){
-                $text = "Nombre de poste"; 
-                }
-            }
             echo "<th>$text</th>\n";
 
 

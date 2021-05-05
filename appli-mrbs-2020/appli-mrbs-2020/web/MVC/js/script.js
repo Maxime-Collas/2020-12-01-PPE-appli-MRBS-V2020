@@ -141,31 +141,41 @@ function valideNom(){
 }
 
 function valideIP(){
-    let bit = selectindIP.value.split('.')
+
     let faux = false; 
+    let bit = selectindIP.value.split('.')
 
-    if (bit.length < 4) {
 
-        for (let i = 0; i < bit.length; i++) {
+    if (bit.length == 3 && bit[2].length > 0) {
 
-            let valide = bit[i].replace(/[^\0-9]/ig, "")
-            if (valide == bit[i]) {
+        let valide = bit[0].replace(/[^\0-9]/ig, "")
+        let valide1 = bit[1].replace(/[^\0-9]/ig, "")
+        let valide2 = bit[2].replace(/[^\0-9]/ig, "")
 
-                if (valide <= 255 && valide >= 0 && valide.length < 4) {
+        if (valide == bit[0] &&
+            valide1 == bit[1] &&
+            valide2 == bit[2]) {
+
+            if (valide <= 255 && valide >= 0 && valide.length < 4 &&
+                valide1 <= 255 && valide1 >= 0 && valide1.length < 4 &&
+                valide2 <= 255 && valide2 >= 0 && valide2.length < 4) {
+
                     selectindIP.style.borderBlockColor = "green"
                     selectindIP.style.borderWidth = "3px"
                     btnValide.disabled = false
-                } else {
-                    //faux = true
-                    selectindIP.style.borderBlockColor = "blue"
-                }
+
             } else {
-               // faux = true
-                selectindIP.style.borderBlockColor = "Yello"
+                    faux = true
+                    //selectindIP.style.borderBlockColor = "blue"
             }
+        } else {
+                faux = true
+                //selectindIP.style.borderBlockColor = "black"
         }
+
     } else {
-        faux = true
+        selectindIP.style.borderBlockColor = "blue"
+        btnValide.disabled = true
     }
     if (faux == true) {
         selectindIP.style.borderBlockColor = "red"

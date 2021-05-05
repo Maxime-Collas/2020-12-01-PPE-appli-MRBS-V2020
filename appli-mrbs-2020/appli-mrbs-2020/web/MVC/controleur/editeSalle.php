@@ -213,11 +213,11 @@ function get_fieldset_general($data)
   // Capacity
   $field = new FieldInputNumber();
   if ($data['area_id'] == 1) {
-      $field->setLabel("Nombre de Poste")
+      $field->setLabel(get_vocab('capacity'))
             ->setControlAttributes(array('name'     => 'capacity',
                                          'min'      => '0',
                                          'value'    => $data['capacity'],
-                                         'disabled' => True));
+                                         'disabled' => $disabled));
       $fieldset->addElement($field);
   } else{
     $field->setLabel(get_vocab('capacity'))

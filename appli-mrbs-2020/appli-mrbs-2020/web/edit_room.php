@@ -200,21 +200,14 @@ function get_fieldset_general($data)
 
   // Capacity
   $field = new FieldInputNumber();
-  if ($data['area_id'] == 1) {
-      $field->setLabel("Nombre de Poste")
-            ->setControlAttributes(array('name'     => 'capacity',
-                                         'min'      => '0',
-                                         'value'    => $data['capacity'],
-                                         'disabled' => $disabled));
-      $fieldset->addElement($field);
-  } else{
+
     $field->setLabel(get_vocab('capacity'))
         ->setControlAttributes(array('name'     => 'capacity',
                                      'min'      => '0',
                                      'value'    => $data['capacity'],
                                      'disabled' => $disabled));
     $fieldset->addElement($field);
-  }
+
   // Room admin email
   $field = new FieldInputEmail();
   $field->setLabel(get_vocab('room_admin_email'))
