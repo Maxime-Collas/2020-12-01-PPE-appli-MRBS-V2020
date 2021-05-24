@@ -158,20 +158,20 @@ function get_fieldset_general($data)
 
   $infoPoste = unPoste($_GET['poste'])[0]; // donne toutes les informations sur le poste selectionne
 
- /**********************           **********************/
- // liste des Poste pour la salle actuellement selectionne  
+  /**********************           **********************/
+  // liste des Poste pour la salle actuellement selectionne  
  
- $touslesPostes = allPoste();
- $nomPostes[] = 'nouveau Poste'; 
- $idPostes[] = null; 
- foreach($touslesPostes as $lePoste){
+  $touslesPostes = allPoste();
+  $nomPostes[] = 'nouveau Poste'; 
+  $idPostes[] = null; 
+  foreach($touslesPostes as $lePoste){
       $nomPostes[$lePoste['Numero']] = $lePoste['Nom']; 
- }
+  }
    /*
   var_dump($nomPostes); 
   echo " </br> "; 
   var_dump($idPostes); 
- /**/
+  /**/
   $field = new FieldSelect();
   $field->setLabel('Numero Poste') 
         ->setControlAttributes(array('name'     => 'new_Poste',
@@ -189,7 +189,7 @@ function get_fieldset_general($data)
   var_dump($nomSalles); 
   echo " </br> "; 
   var_dump($idSalles); 
- /**/
+  /**/
 
   $field = new FieldSelect();
   $field->setLabel('Numero Salle')
